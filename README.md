@@ -3,4 +3,7 @@ Code for Computational Semantics project: Implementation of an automated tagger 
 
 Authors: M. Bouma (S3142558), F. Perin (S2865300)
 
-## main.py
+## dataframe files
+- .ipynb: main notebook
+- .py: python copy of main notebook
+- .html: link to visual version of notebook without having to run jupyter notebook
