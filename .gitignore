@@ -128,7 +128,3 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
-
-# Marieke's html opener to view notebooks quickly
-.html
-.sh
