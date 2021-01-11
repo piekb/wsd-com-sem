@@ -65,32 +65,33 @@ def context_window(bucket_size, features):
 
         # pad with "x"
         words = np.array(pad(words, (bucket_size - 1)/2))
-
-        overlap_count = bucket_size - 1
-        slider = Slider(bucket_size, overlap_count)
-        slider.fit(words)
-        while True:
-            window_data = slider.slide()
-
-            main_word = list(window_data)[int(overlap_count / 2)]
-            sense = sentence[sentence['word'] == main_word]['sns'].values[0]
-
-            # only consider words for "main word" when they have a sense
-            if sense != 'O':
-                stripped = list(np.delete(window_data, np.where(window_data == "x")))
-
-                out = out.append(
-                    pd.Series({'sentence': sent_id, 'word': main_word, 'sense': sense, 'context': stripped}),
-                    ignore_index=True)
-
-                for f in features:
-                    
-                    out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1] = list(
-                        sentence[sentence['word'].isin(window_data)][f].values)
-
-                    #print(out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1])
-
-            if slider.reached_end_of_list(): break
+        if len(words) >= bucket_size:
+                overlap_count = bucket_size - 1
+                slider = Slider(bucket_size, overlap_count)
+                slider.fit(words)
+                while True:
+                    window_data = slider.slide()
+        
+                    main_word = list(window_data)[int(overlap_count / 2)]
+                    sense = sentence[sentence['word'] == main_word]['sns'].values[0]
+        
+                    # only consider words for "main word" when they have a sense
+                    if sense != 'O':
+                        stripped = list(np.delete(window_data, np.where(window_data == "x")))
+        
+                        out = out.append(
+                            pd.Series({'sentence': sent_id, 'word': main_word, 'sense': sense, 'context': stripped}),
+                            ignore_index=True)
+        
+                        for f in features:
+                            
+                            out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1] = list(
+                                sentence[sentence['word'].isin(window_data)][f].values)
+        
+                            #print(out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1])
+        
+                    if slider.reached_end_of_list(): break
+        else: print(words, len(words))
     display(out)
     out.to_csv(f"context_size_{bucket_size}.csv")
 
