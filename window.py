@@ -7,13 +7,20 @@ import sys
 
 ######## NOT FINISHED (do not touch for now)#####################
 
+def clean_up_str(s):
+
+    if s.startswith(' '):
+        s=s[:1]
+
+    return s
+
 def feature_extractor(c,feat,df):
 
     feature = df[df['sense'] == c]
 
     #print(feature[feat].tolist())
 
-    return feature[feat].tolist()
+    return feature[feat]
 
 def counter(classes, feature,df):
     counter_f= {}
@@ -22,7 +29,7 @@ def counter(classes, feature,df):
 
         if c not in counter_f.keys():
 
-                counter_f[c]={}
+            counter_f[c]={}
         print(c)
 
         out = feature_extractor(c,feature,df)
@@ -30,7 +37,11 @@ def counter(classes, feature,df):
 
         for item in out:
 
-            for i in item:
+            list_item = list(item.strip("] [").split(", "))
+
+            print(list_item)
+
+            for i in list_item:
 
                 if i not in counter_f[c].keys():
                     counter_f[c][i]= 0
@@ -98,15 +109,17 @@ def context_window(bucket_size, features):
 
 if __name__ == '__main__':
 
-    context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
+    #context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
 
-    #df = pd.read_csv (r'context_size_3.csv')
+    df = pd.read_csv (r'context_size_3.csv')
+
+    print(df)
     
-    #c=["male.n.02","carry.v.01"]
-    #gen_feat=["sym_context","sem_context","sns_context"]
+    c=["male.n.02","carry.v.01"]
+    gen_feat=["sym_context","sem_context","sns_context"]
 
 
     #out=feature_extractor(c, gen_feat[0], df)
-    #count= counter(c,gen_feat[0], df)
-    #print(count)
+    count= counter(c,gen_feat[0], df)
+    print(count)
 
