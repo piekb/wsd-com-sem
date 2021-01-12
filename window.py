@@ -5,53 +5,13 @@ import pandas as pd
 import sys
 
 
-######## NOT FINISHED (do not touch for now)#####################
+def pad_both(lst, pad_size):
+    before = pad_size * ["x"]
+    after = (pad_size - 1) * ["x"]
+    lst = before + lst + after
+    print(lst)
+    return lst
 
-def clean_up_str(s):
-
-    if s.startswith(' '):
-        s=s[:1]
-
-    return s
-
-def feature_extractor(c,feat,df):
-
-    feature = df[df['sense'] == c]
-
-    #print(feature[feat].tolist())
-
-    return feature[feat]
-
-def counter(classes, feature,df):
-    counter_f= {}
-
-    for c in classes:
-
-        if c not in counter_f.keys():
-
-            counter_f[c]={}
-        print(c)
-
-        out = feature_extractor(c,feature,df)
-        print(out)
-
-        for item in out:
-
-            list_item = list(item.strip("] [").split(", "))
-
-            print(list_item)
-
-            for i in list_item:
-
-                if i not in counter_f[c].keys():
-                    counter_f[c][i]= 0
-
-                counter_f[c][i]+=1
-
-
-    return counter_f
-
-#########################################################
 
 def pad(lst, n):
     cnt = 0
@@ -75,51 +35,40 @@ def context_window(bucket_size, features):
         words = list(sentence['word'].values)
 
         # pad with "x"
-        words = np.array(pad(words, (bucket_size - 1)/2))
+        words = np.array(pad_both(words, (bucket_size - 1) / 2))
         if len(words) >= bucket_size:
-                overlap_count = bucket_size - 1
-                slider = Slider(bucket_size, overlap_count)
-                slider.fit(words)
-                while True:
-                    window_data = slider.slide()
-        
-                    main_word = list(window_data)[int(overlap_count / 2)]
-                    sense = sentence[sentence['word'] == main_word]['sns'].values[0]
-        
-                    # only consider words for "main word" when they have a sense
-                    if sense != 'O':
-                        stripped = list(np.delete(window_data, np.where(window_data == "x")))
-        
-                        out = out.append(
-                            pd.Series({'sentence': sent_id, 'word': main_word, 'sense': sense, 'context': stripped}),
-                            ignore_index=True)
-        
-                        for f in features:
-                            
-                            out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1] = list(
-                                sentence[sentence['word'].isin(window_data)][f].values)
-        
-                            #print(out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1])
-        
-                    if slider.reached_end_of_list(): break
-        else: print(words, len(words))
+            overlap_count = bucket_size - 1
+            slider = Slider(bucket_size, overlap_count)
+            slider.fit(words)
+            while True:
+                window_data = slider.slide()
+
+                # TODO match with sentences with padding on both sides
+                main_word = list(window_data)[int(overlap_count / 2)]
+                sense = sentence[sentence['word'] == main_word]['sns'].values[0]
+
+                # only consider words for "main word" when they have a sense
+                if sense != 'O':
+                    stripped = list(np.delete(window_data, np.where(window_data == "x")))
+
+                    out = out.append(
+                        pd.Series({'sentence': sent_id, 'word': main_word, 'sense': sense, 'context': stripped}),
+                        ignore_index=True)
+
+                    for f in features:
+                        out[f"{f}_context"].loc[len(out[f"{f}_context"]) - 1] = list(
+                            sentence[sentence['word'].isin(window_data)][f].values)
+
+                if slider.reached_end_of_list(): break
+        else:
+            print(words, len(words))
     display(out)
     out.to_csv(f"context_size_{bucket_size}.csv")
 
 
 if __name__ == '__main__':
-
-    #context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
-
-    df = pd.read_csv (r'context_size_3.csv')
-
-    print(df)
-    
-    c=["male.n.02","carry.v.01"]
-    gen_feat=["sym_context","sem_context","sns_context"]
-
-
-    #out=feature_extractor(c, gen_feat[0], df)
-    count= counter(c,gen_feat[0], df)
-    print(count)
-
+    # context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
+    s = ['Tom', 'was', 'carrying', 'a', 'bucket', 'of', 'water', '.']
+    s2 = ['Hey', '!']
+    s3 = ['The', 'weather']
+    pad_both(s3, 2)
