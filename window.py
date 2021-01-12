@@ -35,7 +35,7 @@ def context_window(bucket_size, features):
         words = list(sentence['word'].values)
 
         # pad with "x"
-        words = np.array(pad_both(words, (bucket_size - 1) / 2))
+        words = np.array(pad_both(words, int((bucket_size - 1) / 2)))
         if len(words) >= bucket_size:
             overlap_count = bucket_size - 1
             slider = Slider(bucket_size, overlap_count)
@@ -45,6 +45,7 @@ def context_window(bucket_size, features):
 
                 # TODO match with sentences with padding on both sides
                 main_word = list(window_data)[int(overlap_count / 2)]
+                if main_word == "x": break
                 sense = sentence[sentence['word'] == main_word]['sns'].values[0]
 
                 # only consider words for "main word" when they have a sense
@@ -67,8 +68,8 @@ def context_window(bucket_size, features):
 
 
 if __name__ == '__main__':
-    # context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
-    s = ['Tom', 'was', 'carrying', 'a', 'bucket', 'of', 'water', '.']
-    s2 = ['Hey', '!']
-    s3 = ['The', 'weather']
-    pad_both(s3, 2)
+    context_window(int(sys.argv[1]), ['sym', 'sem', 'sns'])
+    #s = ['Tom', 'was', 'carrying', 'a', 'bucket', 'of', 'water', '.']
+    #s2 = ['Hey', '!']
+    #s3 = ['The', 'weather']
+    #pad_both(s3, 2)
