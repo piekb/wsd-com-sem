@@ -63,15 +63,13 @@ def counter(c, features, counter_f = {}):
             feats = dict()
         )
 
-
-    counter_f[super_class][c]['tot'] +=1
-
-    for f in set(features):
+    for f in features:
 
         if f not in counter_f[super_class][c]['feats'].keys():
             counter_f[super_class][c]['feats'][f]= 0
 
         counter_f[super_class][c]['feats'][f]+=1
+        counter_f[super_class][c]['tot'] +=1
 
 
     return counter_f
