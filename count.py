@@ -8,11 +8,22 @@ import sys
 
 def feature_extractor(c, feat, df):
 
+    l=[]
     feature = df[df['sense'] == c]
 
     #print(feature[feat].tolist())
 
-    return feature.loc[:, feat]
+    for item in feature.loc[:, feat].values:
+
+        for feat_type in item:
+
+            cont_elem= list(feat_type.strip("] [").split(", "))
+
+            for i in cont_elem:
+
+                l.append(i)
+
+    return l
 
 def counter(classes, feature, df):
     counter_f= {}
@@ -23,18 +34,12 @@ def counter(classes, feature, df):
 
         out = feature_extractor(c, feature, df)
 
-        for item in out.values:
+        for f in out:
 
-            for feat_type in item:
+            if f not in counter_f[c].keys():
+                counter_f[c][f]= 0
 
-                list_item = list(feat_type.strip("] [").split(", "))
-
-                for i in list_item:
-
-                    if i not in counter_f[c].keys():
-                        counter_f[c][i]= 0
-
-                    counter_f[c][i]+=1
+            counter_f[c][f]+=1
 
 
     return counter_f
