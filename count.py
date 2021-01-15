@@ -15,13 +15,13 @@ def feature_extractor(c, feat, df):
 
     for item in feature.loc[:, feat].values:
 
-        for feat_type in item:
+        for feat_name, feat_vals in zip(feat, item):
 
-            cont_elem= list(feat_type.strip("] [").split(", "))
+            cont_elem= list(feat_vals.strip("] [").replace("'", '').split(", "))
 
             for i in cont_elem:
 
-                l.append(i)
+                l.append(feat_name + '_' + i)
 
     return l
 
