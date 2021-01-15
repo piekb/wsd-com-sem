@@ -17,6 +17,39 @@ def feature_extractor(sentence, feat):
 
     return l
 
+def log_probs(super_class, features, counter_f):
+
+    probs = dict()
+
+    tot_cls_freq = 0
+    for c in counter_f[super_class].values():
+        tot_cls_freq += c['tot']
+
+    for c in counter_f[super_class].keys():
+
+        # Add prior
+        probs[c] = np.log(c['tot']/tot_cls_freq)
+
+        # Sum log probs features
+        for f in features:
+
+            if f in c['feats'].keys():
+                probs[c] += np.log(c['feats'][f]/c['tot'])
+
+    return probs
+
+def greedy_classify(class_probs):
+
+    best = None
+
+    for c, c_prob in class_probs.items():
+
+        if best is None or class_probs[best] < c_prob:
+            best = c
+
+    return best
+
+
 def counter(c, features, counter_f = {}):
 
     super_class = '.'.join(c.split('.')[:2])
