@@ -19,15 +19,26 @@ def feature_extractor(sentence, feat):
 
 def counter(c, features, counter_f = {}):
 
-    if c not in counter_f.keys():
-        counter_f[c]={}
+    super_class = '.'.join(c.split('.')[:2])
 
-    for f in features:
+    if super_class not in counter_f.keys():
+        counter_f[super_class] = {}
 
-        if f not in counter_f[c].keys():
-            counter_f[c][f]= 0
+    if c not in counter_f[super_class].keys():
+        counter_f[super_class][c] = dict(
+            tot = 0,
+            feats = dict()
+        )
 
-        counter_f[c][f]+=1
+
+    counter_f[super_class][c]['tot'] +=1
+
+    for f in set(features):
+
+        if f not in counter_f[super_class][c]['feats'].keys():
+            counter_f[super_class][c]['feats'][f]= 0
+
+        counter_f[super_class][c]['feats'][f]+=1
 
 
     return counter_f
