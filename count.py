@@ -6,46 +6,35 @@ import sys
 
 ######## NOT FINISHED (do not touch for now)#####################
 
-def clean_up_str(s):
-
-    if s.startswith(' '):
-        s=s[:1]
-
-    return s
-
-def feature_extractor(c,feat,df):
+def feature_extractor(c, feat, df):
 
     feature = df[df['sense'] == c]
 
     #print(feature[feat].tolist())
 
-    return feature[feat]
+    return feature.loc[:, feat]
 
-def counter(classes, feature,df):
+def counter(classes, feature, df):
     counter_f= {}
 
     for c in classes:
 
-        if c not in counter_f.keys():
+        counter_f[c]={}
 
-            counter_f[c]={}
-        print(c)
+        out = feature_extractor(c, feature, df)
 
-        out = feature_extractor(c,feature,df)
-        print(out)
+        for item in out.values:
 
-        for item in out:
+            for feat_type in item:
 
-            list_item = list(item.strip("] [").split(", "))
+                list_item = list(feat_type.strip("] [").split(", "))
 
-            print(list_item)
+                for i in list_item:
 
-            for i in list_item:
+                    if i not in counter_f[c].keys():
+                        counter_f[c][i]= 0
 
-                if i not in counter_f[c].keys():
-                    counter_f[c][i]= 0
-
-                counter_f[c][i]+=1
+                    counter_f[c][i]+=1
 
 
     return counter_f
@@ -63,5 +52,5 @@ if __name__ == '__main__':
 
 
     #out=feature_extractor(c, gen_feat[0], df)
-    count= counter(c,gen_feat[0], df)
+    count= counter(c,gen_feat, df)
     print(count)
