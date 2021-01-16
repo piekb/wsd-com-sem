@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import sys
 
+
 ######## NOT FINISHED (do not touch for now)#####################
 
 def feature_extractor(sentence, feat):
@@ -17,24 +18,25 @@ def feature_extractor(sentence, feat):
 
     return l
 
-def log_probs(super_class, features, counter_f):
+def log_probs(super_class, features, counter_f, k):
 
     probs = dict()
 
     tot_cls_freq = 0
-    for c in counter_f[super_class].values():
+    for c in counter_f[super_class]['cls'].values():
         tot_cls_freq += c['tot']
 
-    for c in counter_f[super_class].keys():
+    for c in counter_f[super_class]['cls'].keys():
 
         # Add prior
         probs[c] = np.log(c['tot']/tot_cls_freq)
 
+
         # Sum log probs features
         for f in features:
 
-            if f in c['feats'].keys():
-                probs[c] += np.log(c['feats'][f]/c['tot'])
+            if k!=0 or (f in c['feats'].keys()) :
+                probs[c] += np.log((c['feats'][f]+k)/(c['tot']+ len(counter_f[super_class]['vocab'])*k))
 
     return probs
 
@@ -55,22 +57,28 @@ def counter(c, features, counter_f = {}):
     super_class = '.'.join(c.split('.')[:2])
 
     if super_class not in counter_f.keys():
-        counter_f[super_class] = {}
+        counter_f[super_class] = dict(
+            vocab = [],
+            cls = dict()
+        )
 
     if c not in counter_f[super_class].keys():
-        counter_f[super_class][c] = dict(
+        counter_f[super_class]['cls'][c] = dict(
             tot = 0,
             feats = dict()
         )
 
     for f in features:
 
-        if f not in counter_f[super_class][c]['feats'].keys():
-            counter_f[super_class][c]['feats'][f]= 0
+        if f not in counter_f[super_class]['vocab']:
+            counter_f[super_class]['vocab'].append(f)
 
-        counter_f[super_class][c]['feats'][f]+=1
-        counter_f[super_class][c]['tot'] +=1
 
+        if f not in counter_f[super_class]['cls'][c]['feats'].keys():
+            counter_f[super_class]['cls'][c]['feats'][f]= 0
+
+        counter_f[super_class]['cls'][c]['feats'][f]+=1
+        counter_f[super_class]['cls'][c]['tot'] +=1
 
     return counter_f
 
