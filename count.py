@@ -7,14 +7,17 @@ import sys
 
 ######## NOT FINISHED (do not touch for now)#####################
 
-def feature_extractor(sentence, feat):
+def feature_extractor(idx, sentence, feat, bucket_size):
+
+    sentence = sentence.loc[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
 
     l=[]
 
-
     for _, word_data in sentence.iterrows():
         for feat_name in feat:
-            l.append(feat_name + '_' + word_data[feat_name])
+
+            if word_data[feat_name] is not None:
+                l.append(feat_name + '_' + word_data[feat_name])
 
     return l
 
