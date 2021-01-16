@@ -9,7 +9,7 @@ import sys
 
 def feature_extractor(idx, sentence, feat, bucket_size):
 
-    sentence = sentence.loc[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
+    sentence = sentence[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
 
     l=[]
 
@@ -25,25 +25,31 @@ def log_probs(super_class, features, counter_f, k):
 
     probs = dict()
 
+    if super_class not in counter_f:
+        return None
+
     tot_cls_freq = 0
     for c in counter_f[super_class]['cls'].values():
         tot_cls_freq += c['tot']
 
-    for c in counter_f[super_class]['cls'].keys():
+    for c, c_freq in counter_f[super_class]['cls'].items():
 
         # Add prior
-        probs[c] = np.log(c['tot']/tot_cls_freq)
+        probs[c] = np.log(c_freq['tot']/tot_cls_freq)
 
 
         # Sum log probs features
         for f in features:
 
-            if k!=0 or (f in c['feats'].keys()) :
-                probs[c] += np.log((c['feats'][f]+k)/(c['tot']+ len(counter_f[super_class]['vocab'])*k))
+            if k!=0 or (f in c_freq['feats'].keys()) :
+                probs[c] += np.log((c_freq['feats'].get(f, 0)+k)/(c_freq['tot']+ len(counter_f[super_class]['vocab'])*k))
 
     return probs
 
 def greedy_classify(class_probs):
+
+    if class_probs is None:
+        return 'unknown'
 
     best = None
 
@@ -53,6 +59,17 @@ def greedy_classify(class_probs):
             best = c
 
     return best
+
+def make_naive_classify(feat, bucket_size, counter_f, k):
+
+    def classify(idx, sentence, super_class):
+
+        features = feature_extractor(idx, sentence, feat, bucket_size)
+        class_probs = log_probs(super_class, features, counter_f, k)
+
+        return greedy_classify(class_probs)
+
+    return classify
 
 
 def counter(c, features, counter_f = {}):
@@ -65,7 +82,7 @@ def counter(c, features, counter_f = {}):
             cls = dict()
         )
 
-    if c not in counter_f[super_class].keys():
+    if c not in counter_f[super_class]['cls'].keys():
         counter_f[super_class]['cls'][c] = dict(
             tot = 0,
             feats = dict()
@@ -75,7 +92,6 @@ def counter(c, features, counter_f = {}):
 
         if f not in counter_f[super_class]['vocab']:
             counter_f[super_class]['vocab'].append(f)
-
 
         if f not in counter_f[super_class]['cls'][c]['feats'].keys():
             counter_f[super_class]['cls'][c]['feats'][f]= 0
