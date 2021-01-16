@@ -6,7 +6,6 @@ import sys
 
 from count import *
 
-
 def pad_both(lst, pad_size):
     before = pad_size * ["x"]
     after = (pad_size - 1) * ["x"]
@@ -84,4 +83,4 @@ if __name__ == '__main__':
 
     
     gen_feat=["sym"]
-    count= scrolling_window("dev.csv", 3, gen_feat)
+    count= scrolling_window("train.csv", 3, gen_feat)
