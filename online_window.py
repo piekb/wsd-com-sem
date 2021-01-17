@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import sys
 
+from argparse import ArgumentParser
+
 from count import *
 
 def pad_both(lst, pad_size):
@@ -102,17 +104,45 @@ def scrolling_window(dataset_name, bucket_size, features):
 if __name__ == '__main__':
 
     # Define parameters
-    feat=["sym", "sns"]
-    k = 1
-    bucket_size = 3
+
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        '--feat',
+        nargs = '+',
+        type = str,
+        required = True,
+        help = 'Feature types to use',
+    )
+
+    parser.add_argument(
+        '-k',
+        type = float,
+        default = 1.0,
+        help = 'Laplacian smoothing constant',
+    )
+
+    parser.add_argument(
+        '--bucket_size',
+        type = int,
+        choices = [3, 5 , 7],
+        required = True,
+        help = 'Context window size',
+    )
+
+    args = parser.parse_args()
+    print('Using:')
+
+    for k, v in args.__dict__.items():
+        print(f'\t {k} : {v}')
 
     # Train model
     print('Training... ', end='')
-    counter_f = scrolling_window("data/csv/train.csv", bucket_size, feat)
+    counter_f = scrolling_window("data/csv/train.csv", args.bucket_size, args.feat)
     print('done')
 
     # Create classifier
-    classify = make_naive_classify(feat, bucket_size, counter_f, k)
+    classify = make_naive_classify(args.feat, args.bucket_size, counter_f, args.k)
 
     # Evaluate classifier
     acc_train = eval("data/csv/train.csv", classify)
