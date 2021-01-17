@@ -123,12 +123,22 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--bucket_size',
+        '--bucket_sizes',
         type = int,
-        choices = [3, 5 , 7],
+        nargs = '+',
+        choices = [3, 5 , 7, 9],
         required = True,
         help = 'Context window size',
     )
+
+    parser.add_argument(
+        '--pooling',
+        type = str,
+        default = 'average',
+        choices = ['average', 'voting'],
+        help = 'Pooling function to use for ensemble',
+    )
+
 
     args = parser.parse_args()
     print('Using:')
@@ -137,12 +147,18 @@ if __name__ == '__main__':
         print(f'\t {k} : {v}')
 
     # Train model
-    print('Training... ', end='')
-    counter_f = scrolling_window("data/csv/train.csv", args.bucket_size, args.feat)
-    print('done')
+    counter_fs=[]
+    for bucket_size in args.bucket_sizes:
+        print(f'Training for bucket size={bucket_size}... ', end='')
+        counter_fs.append(scrolling_window("data/csv/train.csv", bucket_size, args.feat))
+        print('Done')
 
     # Create classifier
-    classify = make_naive_classify(args.feat, args.bucket_size, counter_f, args.k)
+    if len(args.bucket_sizes)==1:
+        classify = make_naive_classify(args.feat, args.bucket_sizes[0], counter_fs[0], args.k)
+
+    else:
+        classify = make_ensemble_classify(args.feat, args.bucket_sizes, counter_fs, args.k, average_classifier if args.pooling=='average' else voting_classifier)
 
     # Evaluate classifier
     acc_train = eval("data/csv/train.csv", classify)

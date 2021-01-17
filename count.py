@@ -3,6 +3,7 @@ from IPython.display import display
 import numpy as np
 import pandas as pd
 import sys
+import random
 
 
 ######## NOT FINISHED (do not touch for now)#####################
@@ -46,7 +47,7 @@ def log_probs(super_class, features, counter_f, k):
 
     return probs
 
-def greedy_classify(class_probs):
+def greedy_classifier(class_probs):
 
     if class_probs is None:
         return 'unknown'
@@ -60,6 +61,55 @@ def greedy_classify(class_probs):
 
     return best
 
+def voting_classifier(class_probs_list):
+
+    classes = list(map(greedy_classifier, class_probs_list))
+
+    votes = {}
+    answer = None
+
+    for cls in classes:
+        votes[cls] = votes.get(cls, 0) + 1
+
+        if answer is None or votes[answer]<votes[cls]:
+            answer = cls
+
+    best_classes = list(
+        map(
+            lambda x : x[0],
+            filter(
+                lambda x : x[1]==votes[answer],
+                votes.items(),
+            ),
+        )
+    )
+
+    return random.sample(best_classes, 1)[0]
+
+def average_classifier(class_probs_list):
+
+    probs={}
+    empty=True
+
+    for class_probs in class_probs_list:
+        if class_probs is not None:
+            empty=False
+            break
+
+    if empty:
+        return 'unknown'
+
+    for cls in class_probs.keys():
+        prob=0
+
+        for item in class_probs_list:
+            prob+=item[cls]
+
+        probs[cls]=prob/len(class_probs_list)
+
+    return greedy_classifier(probs)
+
+
 def make_naive_classify(feat, bucket_size, counter_f, k):
 
     def classify(idx, sentence, super_class):
@@ -67,7 +117,23 @@ def make_naive_classify(feat, bucket_size, counter_f, k):
         features = feature_extractor(idx, sentence, feat, bucket_size)
         class_probs = log_probs(super_class, features, counter_f, k)
 
-        return greedy_classify(class_probs)
+        return greedy_classifier(class_probs)
+
+    return classify
+
+def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
+
+    def classify(idx, sentence, super_class):
+
+        class_probs_list=[]
+
+        for bucket_size, counter_f in zip(bucket_sizes, counter_fs):
+
+            features = feature_extractor(idx, sentence, feat, bucket_size)
+
+            class_probs_list.append(log_probs(super_class, features, counter_f, k))
+
+        return pooling_fn(class_probs_list)
 
     return classify
 
