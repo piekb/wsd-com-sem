@@ -21,8 +21,6 @@
   <component name="ChangeListManager">
     <list default="true" id="33ead8ec-19ac-42ce-9848-ac63b7df7fb3" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataframe.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/dataframe.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/window.py" beforeDir="false" afterPath="$PROJECT_DIR$/window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
