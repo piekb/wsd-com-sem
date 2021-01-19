@@ -1,32 +1,14 @@
-from window_slider import Slider
-from IPython.display import display
 import numpy as np
 import pandas as pd
 import sys
-
+from IPython.display import display
 from argparse import ArgumentParser
-
 from count import *
-
-def pad_both(lst, pad_size):
-    before = pad_size * ["x"]
-    after = (pad_size - 1) * ["x"]
-    lst = before + lst + after
-    # print(lst)
-    return lst
-
-
-def pad(lst, n):
-    cnt = 0
-    while cnt < n:
-        lst = np.insert(lst, 0, "x")
-        cnt += 1
-    # ~ print(lst)
-    return list(lst)
 
 
 def extract_dataset(file_name="data/csv/train.csv"):
     return pd.read_csv(file_name, index_col=0)
+
 
 def eval(dataset_name, classify):
 
@@ -37,14 +19,8 @@ def eval(dataset_name, classify):
 
     for sent_id in df['sentence'].unique():
 
-        # get dataset for sentence and list the words in it
+        # get dataset for sentence
         sentence = df[df['sentence'] == sent_id]
-        # words = list(sentence['word'].values)        
-        # words_idx = list(sentence.index)
-
-        # pad with "x"
-        # words = np.array(pad_both(words, int((bucket_size - 1) / 2)))
-        # words_idx = np.array(pad_both(words_idx, int((bucket_size - 1) / 2)))
 
         for idx, (_, main_word) in enumerate(sentence.iterrows()):
 
@@ -65,6 +41,7 @@ def eval(dataset_name, classify):
 
     return true_pos/total
 
+
 def scrolling_window(dataset_name, bucket_size, features):
 
     df = extract_dataset(dataset_name)
@@ -75,12 +52,6 @@ def scrolling_window(dataset_name, bucket_size, features):
 
         # get dataset for sentence and list the words in it
         sentence = df[df['sentence'] == sent_id]
-        # words = list(sentence['word'].values)        
-        # words_idx = list(sentence.index)
-
-        # pad with "x"
-        # words = np.array(pad_both(words, int((bucket_size - 1) / 2)))
-        # words_idx = np.array(pad_both(words_idx, int((bucket_size - 1) / 2)))
 
         for idx, (_, main_word) in enumerate(sentence.iterrows()):
 
@@ -95,16 +66,12 @@ def scrolling_window(dataset_name, bucket_size, features):
 
             main_word['sns'] = cls
 
-    # display(out)
-    # out.to_csv(f"context_size_{bucket_size}.csv")
-
     return counter_f
 
 
 if __name__ == '__main__':
 
     # Define parameters
-
     parser = ArgumentParser()
 
     parser.add_argument(
@@ -126,7 +93,7 @@ if __name__ == '__main__':
         '--bucket_sizes',
         type = int,
         nargs = '+',
-        choices = [3, 5 , 7, 9],
+        choices = [3, 5, 7, 9],
         required = True,
         help = 'Context window size',
     )
@@ -139,29 +106,26 @@ if __name__ == '__main__':
         help = 'Pooling function to use for ensemble',
     )
 
-
     args = parser.parse_args()
     print('Using:')
-
     for k, v in args.__dict__.items():
         print(f'\t {k} : {v}')
 
     # Train model
-    counter_fs=[]
+    counter_fs = []
     for bucket_size in args.bucket_sizes:
         print(f'Training for bucket size={bucket_size}... ', end='')
         counter_fs.append(scrolling_window("data/csv/train.csv", bucket_size, args.feat))
         print('Done')
 
     # Create classifier
-    if len(args.bucket_sizes)==1:
+    if len(args.bucket_sizes) == 1:
         classify = make_naive_classify(args.feat, args.bucket_sizes[0], counter_fs[0], args.k)
-
     else:
-        classify = make_ensemble_classify(args.feat, args.bucket_sizes, counter_fs, args.k, average_classifier if args.pooling=='average' else voting_classifier)
+        classify = make_ensemble_classify(args.feat, args.bucket_sizes, counter_fs, args.k, average_classifier if args.pooling == 'average' else voting_classifier)
 
     # Evaluate classifier
     acc_train = eval("data/csv/train.csv", classify)
     acc_dev = eval("data/csv/dev.csv", classify)
 
-    print(f'Accuracty train {round(acc_train*100, 2)}%, dev {round(acc_dev*100, 2)}%')
+    print(f'Accuracy train {round(acc_train*100, 2)}%, dev {round(acc_dev*100, 2)}%')

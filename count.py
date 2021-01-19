@@ -1,4 +1,3 @@
-from window_slider import Slider
 from IPython.display import display
 import numpy as np
 import pandas as pd
@@ -6,8 +5,7 @@ import sys
 import random
 
 
-######## NOT FINISHED (do not touch for now)#####################
-
+# Extracts the given features for words in the given sentence
 def feature_extractor(idx, sentence, feat, bucket_size):
 
     sentence = sentence[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
@@ -21,6 +19,7 @@ def feature_extractor(idx, sentence, feat, bucket_size):
                 l.append(feat_name + '_' + word_data[feat_name])
 
     return l
+
 
 def log_probs(super_class, features, counter_f, k):
 
@@ -38,7 +37,6 @@ def log_probs(super_class, features, counter_f, k):
         # Add prior
         probs[c] = np.log(c_freq['tot']/tot_cls_freq)
 
-
         # Sum log probs features
         for f in features:
 
@@ -46,6 +44,7 @@ def log_probs(super_class, features, counter_f, k):
                 probs[c] += np.log((c_freq['feats'].get(f, 0)+k)/(c_freq['tot']+ len(counter_f[super_class]['vocab'])*k))
 
     return probs
+
 
 def greedy_classifier(class_probs):
 
@@ -60,6 +59,7 @@ def greedy_classifier(class_probs):
             best = c
 
     return best
+
 
 def voting_classifier(class_probs_list):
 
@@ -85,6 +85,7 @@ def voting_classifier(class_probs_list):
     )
 
     return random.sample(best_classes, 1)[0]
+
 
 def average_classifier(class_probs_list):
 
@@ -120,6 +121,7 @@ def make_naive_classify(feat, bucket_size, counter_f, k):
         return greedy_classifier(class_probs)
 
     return classify
+
 
 def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
 
@@ -166,7 +168,3 @@ def counter(c, features, counter_f = {}):
         counter_f[super_class]['cls'][c]['tot'] +=1
 
     return counter_f
-
-#########################################################
-
-
