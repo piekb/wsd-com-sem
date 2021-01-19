@@ -5,7 +5,7 @@ import sys
 import random
 
 
-# Extracts the given features for words in the given sentence
+# Extracts the desired features for words in the given sentence, accoridng to the bucket size(s).
 def feature_extractor(idx, sentence, feat, bucket_size):
 
     sentence = sentence[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
@@ -20,7 +20,8 @@ def feature_extractor(idx, sentence, feat, bucket_size):
 
     return l
 
-
+# Given a superclass C, for each subclass c in C we calculate the prior probability, 
+# the class conditional probability, sum the and take the logarithm.
 def log_probs(super_class, features, counter_f, k):
 
     probs = dict()
@@ -45,6 +46,8 @@ def log_probs(super_class, features, counter_f, k):
 
     return probs
 
+# Pooling function for single classifier. 
+# Tis function return the class with the highest value between the log(probability) of each subclass c in C.
 
 def greedy_classifier(class_probs):
 
@@ -60,7 +63,9 @@ def greedy_classifier(class_probs):
 
     return best
 
-
+# Pooling function for ensemble. 
+# This function looks at which subclass c in C was chosen as best in each classifier, 
+# the subclass c that was chosen as best the majority of times is chosen as finel classification.
 def voting_classifier(class_probs_list):
 
     classes = list(map(greedy_classifier, class_probs_list))
@@ -86,7 +91,9 @@ def voting_classifier(class_probs_list):
 
     return random.sample(best_classes, 1)[0]
 
-
+# Pooling function for ensemble. 
+# This function calculates, for each subclass c in C, the average of the log(probability) 
+# between the different classifiers used.
 def average_classifier(class_probs_list):
 
     probs={}
@@ -110,7 +117,8 @@ def average_classifier(class_probs_list):
 
     return greedy_classifier(probs)
 
-
+# Higher level functions - Generators. 
+# This is used for a single classifier.
 def make_naive_classify(feat, bucket_size, counter_f, k):
 
     def classify(idx, sentence, super_class):
@@ -122,7 +130,8 @@ def make_naive_classify(feat, bucket_size, counter_f, k):
 
     return classify
 
-
+# Higher level functions - Generators. 
+# This is used in for the ensemble.
 def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
 
     def classify(idx, sentence, super_class):
@@ -139,7 +148,8 @@ def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
 
     return classify
 
-
+# Function that given a class c and a list of previously extracted features, 
+# returns a counter for said class of how many times each unique feature was encountered.
 def counter(c, features, counter_f = {}):
 
     super_class = '.'.join(c.split('.')[:2])

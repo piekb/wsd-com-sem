@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 import sys
 
+# Function used to covert .txt file to .csv file using a dataframe. 
+# Each line containce the ssentence ID, the word, the corresponding lemmatized word,
+# the semantico role and the semantic derivations.
+# Name of file needs to be manullay changed inside the code, separately from rest of the code.
+
 def read_input(dataset_name):
     df = pd.DataFrame(columns = ["sentence", "word", "sym", "sem", "sns"])
 
