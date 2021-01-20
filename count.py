@@ -29,12 +29,12 @@ def log_probs(super_class, features, counter_f, k):
 
     tot_cls_freq = 0
     for c in counter_f[super_class]['cls'].values():
-        tot_cls_freq += c['tot']
+        tot_cls_freq += c['tot_prior']
 
     for c, c_freq in counter_f[super_class]['cls'].items():
 
         # Add prior
-        probs[c] = np.log(c_freq['tot'] / tot_cls_freq)
+        probs[c] = np.log(c_freq['tot_prior'] / tot_cls_freq)
 
         # Sum log probs features
         for f in features:
@@ -153,8 +153,11 @@ def counter(c, features, counter_f={}):
     if c not in counter_f[super_class]['cls'].keys():
         counter_f[super_class]['cls'][c] = dict(
             tot=0,
+            tot_prior=0,
             feats=dict()
         )
+
+    counter_f[super_class]['cls'][c]['tot_prior'] += 1
 
     for f in features:
 
