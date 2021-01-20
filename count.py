@@ -7,10 +7,9 @@ import random
 
 # Extracts the desired features for words in the given sentence, accoridng to the bucket size(s).
 def feature_extractor(idx, sentence, feat, bucket_size):
+    sentence = sentence[max(0, idx - bucket_size // 2):min(len(sentence), idx + bucket_size // 2)]
 
-    sentence = sentence[max(0, idx-bucket_size//2):min(len(sentence), idx+bucket_size//2)]
-
-    l=[]
+    l = []
 
     for _, word_data in sentence.iterrows():
         for feat_name in feat:
@@ -23,7 +22,6 @@ def feature_extractor(idx, sentence, feat, bucket_size):
 # Given a superclass C, for each subclass c in C we calculate the prior probability, 
 # the class conditional probability, sum the and take the logarithm.
 def log_probs(super_class, features, counter_f, k):
-
     probs = dict()
 
     if super_class not in counter_f:
@@ -36,13 +34,14 @@ def log_probs(super_class, features, counter_f, k):
     for c, c_freq in counter_f[super_class]['cls'].items():
 
         # Add prior
-        probs[c] = np.log(c_freq['tot']/tot_cls_freq)
+        probs[c] = np.log(c_freq['tot'] / tot_cls_freq)
 
         # Sum log probs features
         for f in features:
 
-            if k!=0 or (f in c_freq['feats'].keys()) :
-                probs[c] += np.log((c_freq['feats'].get(f, 0)+k)/(c_freq['tot']+ len(counter_f[super_class]['vocab'])*k))
+            if k != 0 or (f in c_freq['feats'].keys()):
+                probs[c] += np.log(
+                    (c_freq['feats'].get(f, 0) + k) / (c_freq['tot'] + len(counter_f[super_class]['vocab']) * k))
 
     return probs
 
@@ -50,7 +49,6 @@ def log_probs(super_class, features, counter_f, k):
 # Tis function return the class with the highest value between the log(probability) of each subclass c in C.
 
 def greedy_classifier(class_probs):
-
     if class_probs is None:
         return 'unknown'
 
@@ -67,7 +65,6 @@ def greedy_classifier(class_probs):
 # This function looks at which subclass c in C was chosen as best in each classifier, 
 # the subclass c that was chosen as best the majority of times is chosen as finel classification.
 def voting_classifier(class_probs_list):
-
     classes = list(map(greedy_classifier, class_probs_list))
 
     votes = {}
@@ -76,14 +73,14 @@ def voting_classifier(class_probs_list):
     for cls in classes:
         votes[cls] = votes.get(cls, 0) + 1
 
-        if answer is None or votes[answer]<votes[cls]:
+        if answer is None or votes[answer] < votes[cls]:
             answer = cls
 
     best_classes = list(
         map(
-            lambda x : x[0],
+            lambda x: x[0],
             filter(
-                lambda x : x[1]==votes[answer],
+                lambda x: x[1] == votes[answer],
                 votes.items(),
             ),
         )
@@ -95,34 +92,31 @@ def voting_classifier(class_probs_list):
 # This function calculates, for each subclass c in C, the average of the log(probability) 
 # between the different classifiers used.
 def average_classifier(class_probs_list):
-
-    probs={}
-    empty=True
+    probs = {}
+    empty = True
 
     for class_probs in class_probs_list:
         if class_probs is not None:
-            empty=False
+            empty = False
             break
 
     if empty:
         return 'unknown'
 
     for cls in class_probs.keys():
-        prob=0
+        prob = 0
 
         for item in class_probs_list:
-            prob+=item[cls]
+            prob += item[cls]
 
-        probs[cls]=prob/len(class_probs_list)
+        probs[cls] = prob / len(class_probs_list)
 
     return greedy_classifier(probs)
 
 # Higher level functions - Generators. 
 # This is used for a single classifier.
 def make_naive_classify(feat, bucket_size, counter_f, k):
-
     def classify(idx, sentence, super_class):
-
         features = feature_extractor(idx, sentence, feat, bucket_size)
         class_probs = log_probs(super_class, features, counter_f, k)
 
@@ -133,13 +127,10 @@ def make_naive_classify(feat, bucket_size, counter_f, k):
 # Higher level functions - Generators. 
 # This is used in for the ensemble.
 def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
-
     def classify(idx, sentence, super_class):
-
-        class_probs_list=[]
+        class_probs_list = []
 
         for bucket_size, counter_f in zip(bucket_sizes, counter_fs):
-
             features = feature_extractor(idx, sentence, feat, bucket_size)
 
             class_probs_list.append(log_probs(super_class, features, counter_f, k))
@@ -150,20 +141,19 @@ def make_ensemble_classify(feat, bucket_sizes, counter_fs, k, pooling_fn):
 
 # Function that given a class c and a list of previously extracted features, 
 # returns a counter for said class of how many times each unique feature was encountered.
-def counter(c, features, counter_f = {}):
-
+def counter(c, features, counter_f={}):
     super_class = '.'.join(c.split('.')[:2])
 
     if super_class not in counter_f.keys():
         counter_f[super_class] = dict(
-            vocab = [],
-            cls = dict()
+            vocab=[],
+            cls=dict()
         )
 
     if c not in counter_f[super_class]['cls'].keys():
         counter_f[super_class]['cls'][c] = dict(
-            tot = 0,
-            feats = dict()
+            tot=0,
+            feats=dict()
         )
 
     for f in features:
@@ -172,9 +162,9 @@ def counter(c, features, counter_f = {}):
             counter_f[super_class]['vocab'].append(f)
 
         if f not in counter_f[super_class]['cls'][c]['feats'].keys():
-            counter_f[super_class]['cls'][c]['feats'][f]= 0
+            counter_f[super_class]['cls'][c]['feats'][f] = 0
 
-        counter_f[super_class]['cls'][c]['feats'][f]+=1
-        counter_f[super_class]['cls'][c]['tot'] +=1
+        counter_f[super_class]['cls'][c]['feats'][f] += 1
+        counter_f[super_class]['cls'][c]['tot'] += 1
 
     return counter_f

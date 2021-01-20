@@ -12,7 +12,6 @@ def extract_dataset(file_name="data/csv/train.csv"):
 # Function to calculate true positives and true negatives and calculate accuracy
 # Both for ensemble and single classifier.
 def eval(dataset_name, classify):
-
     df = extract_dataset(dataset_name)
 
     true_pos = 0
@@ -40,7 +39,7 @@ def eval(dataset_name, classify):
 
             main_word['sns'] = cls
 
-    return true_pos/total
+    return true_pos / total
 
 # Funciont that takes each sentence in the dataset, iterates through all words
 # if the word possibly has different meanings then it's passed to the feature 
@@ -49,7 +48,6 @@ def eval(dataset_name, classify):
 # In the function we remove the 'sns' of the word (main word) as it cannot be a feature
 # as that's our task and what we are trying to classify.
 def scrolling_window(dataset_name, bucket_size, features):
-
     df = extract_dataset(dataset_name)
 
     counter_f = {}
@@ -59,6 +57,7 @@ def scrolling_window(dataset_name, bucket_size, features):
         # get dataset for sentence and list the words in it
         sentence = df[df['sentence'] == sent_id]
 
+        # loop through sentence
         for idx, (_, main_word) in enumerate(sentence.iterrows()):
 
             if main_word['sns'] == 'O':
@@ -82,34 +81,34 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--feat',
-        nargs = '+',
-        type = str,
-        required = True,
-        help = 'Feature types to use',
+        nargs='+',
+        type=str,
+        required=True,
+        help='Feature types to use',
     )
 
     parser.add_argument(
         '-k',
-        type = float,
-        default = 1.0,
-        help = 'Laplacian smoothing constant',
+        type=float,
+        default=1.0,
+        help='Laplacian smoothing constant',
     )
 
     parser.add_argument(
         '--bucket_sizes',
-        type = int,
-        nargs = '+',
-        choices = [3, 5, 7, 9],
-        required = True,
-        help = 'Context window size',
+        type=int,
+        nargs='+',
+        choices=[3, 5, 7, 9],
+        required=True,
+        help='Context window size',
     )
 
     parser.add_argument(
         '--pooling',
-        type = str,
-        default = 'average',
-        choices = ['average', 'voting'],
-        help = 'Pooling function to use for ensemble',
+        type=str,
+        default='average',
+        choices=['average', 'voting'],
+        help='Pooling function to use for ensemble',
     )
 
     args = parser.parse_args()
@@ -128,10 +127,11 @@ if __name__ == '__main__':
     if len(args.bucket_sizes) == 1:
         classify = make_naive_classify(args.feat, args.bucket_sizes[0], counter_fs[0], args.k)
     else:
-        classify = make_ensemble_classify(args.feat, args.bucket_sizes, counter_fs, args.k, average_classifier if args.pooling == 'average' else voting_classifier)
+        classify = make_ensemble_classify(args.feat, args.bucket_sizes, counter_fs, args.k,
+                                          average_classifier if args.pooling == 'average' else voting_classifier)
 
     # Evaluate classifier
     acc_train = eval("data/csv/train.csv", classify)
     acc_dev = eval("data/csv/dev.csv", classify)
 
-    print(f'Accuracy train {round(acc_train*100, 2)}%, dev {round(acc_dev*100, 2)}%')
+    print(f'Accuracy train {round(acc_train * 100, 2)}%, dev {round(acc_dev * 100, 2)}%')
