@@ -5,9 +5,11 @@ from IPython.display import display
 from argparse import ArgumentParser
 from count import *
 
+
 # Reading .csv and importing to dataframe.
 def extract_dataset(file_name="data/csv/train.csv"):
     return pd.read_csv(file_name, index_col=0)
+
 
 # Function to calculate true positives and true negatives and calculate accuracy
 # Both for ensemble and single classifier.
@@ -41,7 +43,8 @@ def eval(dataset_name, classify):
 
     return true_pos / total
 
-# Funciont that takes each sentence in the dataset, iterates through all words
+
+# Function that takes each sentence in the dataset, iterates through all words
 # if the word possibly has different meanings then it's passed to the feature 
 # extractor which will extract the features of said word for all desired context 
 # windows (bucket sizes).
