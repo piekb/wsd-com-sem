@@ -133,5 +133,6 @@ if __name__ == '__main__':
     # Evaluate classifier
     acc_train = eval("data/csv/train.csv", classify)
     acc_dev = eval("data/csv/dev.csv", classify)
+    acc_test = eval("data/csv/test.csv", classify)
 
-    print(f'Accuracy train {round(acc_train * 100, 2)}%, dev {round(acc_dev * 100, 2)}%')
+    print(f'Accuracy train {round(acc_train * 100, 2)}%, dev {round(acc_dev * 100, 2)}%, test {round(acc_test * 100, 2)}%')
