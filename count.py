@@ -150,6 +150,9 @@ def counter(c, features, counter_f={}):
             cls=dict()
         )
 
+    if len(features) < 1:
+        return counter_f
+
     if c not in counter_f[super_class]['cls'].keys():
         counter_f[super_class]['cls'][c] = dict(
             tot=0,
