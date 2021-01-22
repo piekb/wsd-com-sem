@@ -11,7 +11,7 @@ Then run:
 ``python online_window.py --feat ('sym'|'sem'| 'sns')+ -k K --bucket_size (3| 5| 7)+ --pooling <voting|average>``
 
 Notes: 
-- do not use the --pooling parameter when --bucket_size has a single parameter. 
+- do not use the --pooling parameter when --bucket_size has a single value. 
 - -k is a float value; we recommend assigning it between 0 and 10. 
 - adjust pip and python if needed to use Python 3.
 
