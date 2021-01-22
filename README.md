@@ -5,12 +5,15 @@ Code for Computational Semantics project: Implementation of an automated tagger 
 
 ## running experiments
 To install the required packages, run:
-`pip3 install -r requirements.txt`
+`pip install -r requirements.txt`
 
 Then run:
 ``python online_window.py --feat ('sym'|'sem'| 'sns')+ -k K --bucket_size (3| 5| 7)+ --pooling <voting|average>``
 
-Note: do not use the --pooling parameter when --bucket_size has a single parameter. Furthermore, -k is a float value; we recommend assigning it between 0 and 10.
+Notes: 
+- do not use the --pooling parameter when --bucket_size has a single parameter. 
+- -k is a float value; we recommend assigning it between 0 and 10. 
+- adjust pip and python if needed to use Python 3.
 
 ## data files
 - txt: dev, train, and test files in the form of txt, from the conll data provided
