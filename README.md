@@ -1,7 +1,7 @@
 # wsd-com-sem
 Code for Computational Semantics project: Implementation of an automated tagger for Word Sense Disambiguation (WSD). 
 
-Authors: M. Bouma (S3142558), F. Perin (S2865300)
+ Authors: M. Bouma (S3142558), F. Perin (S2865300)
 
 ## dataframe files
 - .ipynb: main notebook
@@ -12,9 +12,17 @@ Authors: M. Bouma (S3142558), F. Perin (S2865300)
 - data.txt: txt file of dev.conll data
 - dev.csv: csv file of dev.conll data
 - context_size_3.csv: dataset of context window size 3
+- txt: dev, train, and test files in the form of txt, from the conll data provided
+- csv: dev, train, and test files in the form of csv, with cat and rol columns removed
+- context: csv files of context windows from early version, based on dev
 
 ## window file
 - window.py: takes window size as argument to produce dataset with context frames
+## online_window.py
+Contains functions related to the scrolling context window, evaluation, and the main function of the code
+
+## count.py
+Contains functions related to counting frequencies, feature extraction from words in contexts, probabilities and calculation
 
 ## running experiments
 
