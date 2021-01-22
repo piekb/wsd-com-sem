@@ -3,31 +3,22 @@ Code for Computational Semantics project: Implementation of an automated tagger 
 
  Authors: M. Bouma (S3142558), F. Perin (S2865300)
 
-## dataframe files
-- .ipynb: main notebook
-- .py: python copy of main notebook
-- .html: link to visual version of notebook without having to run jupyter notebook
+## running experiments
+To install the required packages, run:
+`pip3 install -r requirements.txt`
+
+Then run:
+``python online_window.py --feat ('sym'|'sem'| 'sns')+ -k K --bucket_size (3| 5| 7)+ --pooling <voting|average>``
+
+Note: do not use the --pooling parameter when --bucket_size has a single parameter. Furthermore, -k is a float value; we recommend assigning it between 0 and 10.
 
 ## data files
-- data.txt: txt file of dev.conll data
-- dev.csv: csv file of dev.conll data
-- context_size_3.csv: dataset of context window size 3
 - txt: dev, train, and test files in the form of txt, from the conll data provided
 - csv: dev, train, and test files in the form of csv, with cat and rol columns removed
 - context: csv files of context windows from early version, based on dev
 
-## window file
-- window.py: takes window size as argument to produce dataset with context frames
 ## online_window.py
 Contains functions related to the scrolling context window, evaluation, and the main function of the code
 
 ## count.py
 Contains functions related to counting frequencies, feature extraction from words in contexts, probabilities and calculation
-
-## running experiments
-
-``python online_window.py --feat ('sym'|'sem'| 'sns')+ -k K --bucket_size (3| 5| 7)+ --pooling <voting|average>``
-
-do not use the --pooling parameter when --bucket_size has a single parameter.
-
-Furthermore K is a float value (we reccomend assignining it between 0 and 10)
