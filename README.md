@@ -15,3 +15,11 @@ Authors: M. Bouma (S3142558), F. Perin (S2865300)
 
 ## window file
 - window.py: takes window size as argument to produce dataset with context frames
+
+## running experiments
+
+``python online_window.py --feat ('sym'|'sem'| 'sns')+ -k K --bucket_size (3| 5| 7)+ --pooling <voting|average>``
+
+do not use the --pooling parameter when --bucket_size has a single parameter.
+
+Furthermore K is a float value (we reccomend assignining it between 0 and 10)
