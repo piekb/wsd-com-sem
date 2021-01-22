@@ -1,7 +1,7 @@
 # wsd-com-sem
-Code for Computational Semantics project: Implementation of an automated tagger for Word Sense Disambiguation (WSD). 
+Code for Computational Semantics project on Word Sense Disambiguation (WSD). 
 
- Authors: M. Bouma (S3142558), F. Perin (S2865300)
+Authors: M. Bouma (S3142558), F. Perin (S2865300) at MSc AI, Rijksuniversiteit Groningen
 
 ## running experiments
 To install the required packages, run:
@@ -16,12 +16,19 @@ Notes:
 - adjust pip and python if needed to use Python 3.
 
 ## data files
-- txt: dev, train, and test files in the form of txt, from the conll data provided
-- csv: dev, train, and test files in the form of csv, with cat and rol columns removed
-- context: csv files of context windows from early version, based on dev
+- txt: dev, train, and test files in the form of txt, from the conll data provided.
+- csv: dev, train, and test files in the form of csv, with cat and rol columns removed.
+- context: csv files of context windows from early version, based on dev.
+
+## dev_files
+Files, code, notebooks, etc. used for development that are not relevant to any other user. 
+
+## data_exp files
+- data_exp.ipynb: jupyter notebook describing data exploration.
+- data_exp.html: html version of the notebook for easier viewing. 
 
 ## online_window.py
-Contains functions related to the scrolling context window, evaluation, and the main function of the code
+Contains functions related to the scrolling context window, evaluation, and the main function of the code.
 
 ## count.py
-Contains functions related to counting frequencies, feature extraction from words in contexts, probabilities and calculation
+Contains functions related to counting frequencies, feature extraction from words in contexts, probabilities and calculation.
